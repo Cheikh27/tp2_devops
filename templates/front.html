@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table de Multiplication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Table de Multiplication</h2>
+        <p>Entrez un nombre pour afficher la table de multiplication correspondante :</p>
+        <input type="number" id="numberInput" placeholder="Entrez un nombre" min="1" max="12">
+        <button onclick="fetchTable()">Afficher la table</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function fetchTable() {
+            const number = document.getElementById('numberInput').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';  // Effacer le contenu précédent
+
+            if (number < 1 || number > 12 || number === '') {
+                resultDiv.innerHTML = '<p>Veuillez entrer un nombre entre 1 et 12.</p>';
+                return;
+            }
+
+            fetch('/get-table', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ number: parseInt(number) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let tableHTML = `<h3>Table de multiplication de ${number}</h3>`;
+                data.forEach(row => {
+                    tableHTML += `<p>${row}</p>`;
+                });
+                resultDiv.innerHTML = tableHTML;
+            })
+            .catch(error => {
+                resultDiv.innerHTML = '<p>Erreur lors de la récupération de la table.</p>';
+                console.error('Erreur:', error);
+            });
+        }
+    </script>
+</body>
+</html>
